@@ -1,11 +1,6 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: "Simon Chan"
-date: "Wednesday, August 12, 2015"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Simon Chan  
+Wednesday, August 12, 2015  
 
 This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals through out the day. The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.  
 
@@ -23,7 +18,8 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
 
 ##Loading and preprocessing the data  
 
-```{r echo = TRUE, warning = FALSE}
+
+```r
 library(plyr)
 library(ggplot2)
 library(lattice)
@@ -32,54 +28,100 @@ activity = read.csv("activity.csv")
 activity <- mutate(activity, datetime=strptime(sprintf("%s %d:%d", date, interval%/%100, interval%%100),"%Y-%m-%d %H:%M"))
 summary(activity)
 ```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840                   
+##     datetime                  
+##  Min.   :2012-10-01 00:00:00  
+##  1st Qu.:2012-10-16 05:58:45  
+##  Median :2012-10-31 11:57:30  
+##  Mean   :2012-10-31 11:57:30  
+##  3rd Qu.:2012-11-15 17:56:15  
+##  Max.   :2012-11-30 23:55:00  
+## 
+```
 ##What is mean total number of steps taken per day? 
 
 ####1. Calculate the total number of steps taken per day
-```{r, echo=TRUE}
+
+```r
 # calculate total number of steps per day
 steps_perday <- aggregate(steps ~ date, data = activity, FUN=sum)
 ```
 
 ####2. Make a histogram of the total number of steps taken each day
-```{r, echo=TRUE}
+
+```r
 # plot the frequency histogram for number of steps per day
 qplot(steps, data=steps_perday, geom="histogram", binwidth=1000, fill=..count.., xlab = "Total Number of Steps Per Day", ylab = "Count")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
 ####3. Calculate and report the mean and median of the total number of steps taken per day
 The **mean** of the total number of steps taken per day is
-```{r, echo = TRUE}
+
+```r
 mean(steps_perday$steps, na.rm=TRUE)
 ```
+
+```
+## [1] 10766.19
+```
 The **median** of the total number of steps taken per day is
-```{r, echo = TRUE}
+
+```r
 median(steps_perday$steps, na.rm=TRUE)
+```
+
+```
+## [1] 10765
 ```
 
 ##What is the average daily activity pattern? 
 
 ####1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
-```{r, echo=TRUE}
+
+```r
 # calculate average steps by interval across days
 steps_byinterval <- aggregate(steps ~ interval, data = activity, FUN=mean)
 # plot the time series diagram for mean number of steps by interval
 xyplot(steps ~ interval, data=steps_byinterval, xlab = "5 Minute Interval", ylab = "Average Number of Steps", type="l")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+
 ####2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 5-minute interval, on average across all the days in the dataset, contains the **maximum number of steps** is 
-```{r, echo = TRUE}
+
+```r
 steps_byinterval[which.max(steps_byinterval$steps),1]
+```
+
+```
+## [1] 835
 ```
 
 ##Imputing missing values 
 
 ####1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
-```{r, echo = TRUE}
+
+```r
 sum(is.na(activity))
+```
+
+```
+## [1] 2304
 ```
 
 ####2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
@@ -93,7 +135,8 @@ Based on the above assumptions we can use the average activity by interval for i
 
 ####3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
-```{r, echo = TRUE}
+
+```r
 ## create a new dataset with imputed missing values  
 activity1 <- activity
 for (i in 1:nrow(activity1) ) {
@@ -106,21 +149,34 @@ for (i in 1:nrow(activity1) ) {
 ####4. Make a histogram of the total number of steps taken each day and Calculate the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 
-```{r, echo=TRUE}
+
+```r
 # summarize total number of steps per day
 steps_perday1 <- aggregate(steps ~ date, data = activity1, FUN=sum)
 # plot the frequency histogram for number of steps per day
 qplot(steps, data=steps_perday1, geom="histogram", binwidth=1000, fill=..count.., xlab = "Total Number of Steps Per Day", ylab = "Count")
-``` 
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
 
 The **mean** of the total number of steps taken per day is  
-```{r, echo = TRUE}
+
+```r
 mean(steps_perday1$steps, na.rm=TRUE)
-```  
+```
+
+```
+## [1] 10766.19
+```
 
 The **median** of the total number of steps taken per day is  
-```{r, echo = TRUE}
+
+```r
 median(steps_perday1$steps, na.rm=TRUE)
+```
+
+```
+## [1] 10766.19
 ```
 
 ####What is the impact of imputing missing data on the estimates of the total daily number of steps?
@@ -132,7 +188,8 @@ Imputing missing data cause the overall daily steps to increase. It also caused 
 
 ####1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 
-```{r, echo = TRUE}
+
+```r
 # convert date from factor to date
 activity$date<-as.Date(activity$date)
 # create a list of weekdays
@@ -144,7 +201,8 @@ activity <- mutate(activity, daysofweek = factor((weekdays(date) %in% weekdaysli
 
 ####2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).  
 
-```{r, echo = TRUE}
+
+```r
 # calculate average steps by interval and by days of week (dow)
 steps_byint_bydow <-aggregate(steps ~ interval+daysofweek, data = activity, FUN=mean, na.rm=TRUE)
 ggplot(steps_byint_bydow, aes(x=interval, y=steps)) + geom_line() + 
@@ -152,5 +210,7 @@ ggplot(steps_byint_bydow, aes(x=interval, y=steps)) + geom_line() +
         xlab("5-minute interval") +
         facet_grid(daysofweek ~ .) 
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
 
 ####End
