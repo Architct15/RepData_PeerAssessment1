@@ -1,6 +1,6 @@
 # Reproducible Research: Peer Assessment 1
 Simon Chan  
-Wednesday, August 12, 2015  
+Sunday, August 16, 2015  
 
 This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals through out the day. The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.  
 
@@ -25,27 +25,20 @@ library(ggplot2)
 library(lattice)
 unzip(zipfile = "activity.zip")
 activity = read.csv("activity.csv")
-activity <- mutate(activity, datetime=strptime(sprintf("%s %d:%d", date, interval%/%100, interval%%100),"%Y-%m-%d %H:%M"))
+# convert date from factor to date
+activity$date<-as.Date(activity$date)
 summary(activity)
 ```
 
 ```
-##      steps                date          interval     
-##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
-##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
-##  Median :  0.00   2012-10-03:  288   Median :1177.5  
-##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
-##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
-##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
-##  NA's   :2304     (Other)   :15840                   
-##     datetime                  
-##  Min.   :2012-10-01 00:00:00  
-##  1st Qu.:2012-10-16 05:58:45  
-##  Median :2012-10-31 11:57:30  
-##  Mean   :2012-10-31 11:57:30  
-##  3rd Qu.:2012-11-15 17:56:15  
-##  Max.   :2012-11-30 23:55:00  
-## 
+##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+##  3rd Qu.: 12.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+##  NA's   :2304
 ```
 ##What is mean total number of steps taken per day? 
 
@@ -184,30 +177,31 @@ median(steps_perday1$steps, na.rm=TRUE)
 Imputing missing data cause the overall daily steps to increase. It also caused the median to increase but the mean remains constant.  
 (The behaviour of the mean and median is dependent on the strategy for imputing missing values)
 
-##Are there differences in activity patterns between weekdays and weekends? 
+##Are there differences in activity patterns between weekdays and weekends?  
 
-####1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+####1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.  
+
 
 
 ```r
-# convert date from factor to date
-activity$date<-as.Date(activity$date)
 # create a list of weekdays
 weekdayslist <- c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')
 # add a new factor variable "daysofweek" and and set to "weekday" or "weekend" depending on the date
-activity <- mutate(activity, daysofweek = factor((weekdays(date) %in% weekdayslist), levels=c(FALSE, TRUE), labels=c('weekend', 'weekday') ))
+activity1 <- mutate(activity1, daysofweek = factor((weekdays(date) %in% weekdayslist), levels=c(FALSE, TRUE), labels=c('weekend', 'weekday') ))
 ```
+
 
 
 ####2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).  
 
 
+
 ```r
 # calculate average steps by interval and by days of week (dow)
-steps_byint_bydow <-aggregate(steps ~ interval+daysofweek, data = activity, FUN=mean, na.rm=TRUE)
+steps_byint_bydow <-aggregate(steps ~ interval+daysofweek, data = activity1, FUN=mean, na.rm=TRUE)
 ggplot(steps_byint_bydow, aes(x=interval, y=steps)) + geom_line() + 
         ylab("Average Number of Steps Taken") + 
-        xlab("5-minute interval") +
+        xlab("5-minute Interval") +
         facet_grid(daysofweek ~ .) 
 ```
 

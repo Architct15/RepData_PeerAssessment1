@@ -1,7 +1,7 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 author: "Simon Chan"
-date: "Wednesday, August 12, 2015"
+date: "Sunday, August 16, 2015"
 output: 
   html_document:
     keep_md: true
@@ -29,7 +29,8 @@ library(ggplot2)
 library(lattice)
 unzip(zipfile = "activity.zip")
 activity = read.csv("activity.csv")
-activity <- mutate(activity, datetime=strptime(sprintf("%s %d:%d", date, interval%/%100, interval%%100),"%Y-%m-%d %H:%M"))
+# convert date from factor to date
+activity$date<-as.Date(activity$date)
 summary(activity)
 ```
 ##What is mean total number of steps taken per day? 
@@ -128,28 +129,29 @@ median(steps_perday1$steps, na.rm=TRUE)
 Imputing missing data cause the overall daily steps to increase. It also caused the median to increase but the mean remains constant.  
 (The behaviour of the mean and median is dependent on the strategy for imputing missing values)
 
-##Are there differences in activity patterns between weekdays and weekends? 
+##Are there differences in activity patterns between weekdays and weekends?  
 
-####1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+####1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.  
+
 
 ```{r, echo = TRUE}
-# convert date from factor to date
-activity$date<-as.Date(activity$date)
 # create a list of weekdays
 weekdayslist <- c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')
 # add a new factor variable "daysofweek" and and set to "weekday" or "weekend" depending on the date
-activity <- mutate(activity, daysofweek = factor((weekdays(date) %in% weekdayslist), levels=c(FALSE, TRUE), labels=c('weekend', 'weekday') ))
+activity1 <- mutate(activity1, daysofweek = factor((weekdays(date) %in% weekdayslist), levels=c(FALSE, TRUE), labels=c('weekend', 'weekday') ))
 ```
+
 
 
 ####2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).  
 
+
 ```{r, echo = TRUE}
 # calculate average steps by interval and by days of week (dow)
-steps_byint_bydow <-aggregate(steps ~ interval+daysofweek, data = activity, FUN=mean, na.rm=TRUE)
+steps_byint_bydow <-aggregate(steps ~ interval+daysofweek, data = activity1, FUN=mean, na.rm=TRUE)
 ggplot(steps_byint_bydow, aes(x=interval, y=steps)) + geom_line() + 
         ylab("Average Number of Steps Taken") + 
-        xlab("5-minute interval") +
+        xlab("5-minute Interval") +
         facet_grid(daysofweek ~ .) 
 ```
 
